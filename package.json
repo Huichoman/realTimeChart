@@ -9,10 +9,24 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@dpwiese/react-native-canvas-charts": "^0.0.4",
+    "@react-navigation/native": "^6.0.12",
+    "@react-navigation/native-stack": "^6.8.0",
     "expo": "~46.0.9",
     "expo-status-bar": "~1.4.0",
+    "firebase": "^9.9.4",
     "react": "18.0.0",
-    "react-native": "0.69.5"
+    "react-native": "0.69.5",
+    "react-native-chart-kit": "^6.12.0",
+    "react-native-charts-wrapper": "^0.5.9",
+    "react-native-highcharts": "^1.0.2",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-line-chart": "^1.0.4",
+    "react-native-safe-area-context": "4.3.1",
+    "react-native-screens": "~3.15.0",
+    "react-native-webview": "^11.23.1",
+    "victory-native": "^36.6.7",
+    "react-native-svg": "12.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
