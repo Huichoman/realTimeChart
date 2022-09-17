@@ -11,13 +11,14 @@ import {
 } from "react-native";
 
 import {
+  VictoryScatter,
   VictoryLine,
   VictoryChart,
   VictoryTheme,
   VictoryClipContainer,
 } from "victory-native";
 
-export const PlotData = ({ fbData }) => {
+export const PlotData = ({ fbData, sensorData }) => {
   const [chartData, setChartData] = useState([]);
 
   //   useEffect(() => {
@@ -26,7 +27,7 @@ export const PlotData = ({ fbData }) => {
   //   }, []);
   //
   useEffect(() => {
-    const timer = setTimeout(() => addData(), 100);
+    const timer = setTimeout(() => addData(), 1000);
     return () => clearTimeout(timer);
   }, [fbData]);
 
@@ -35,28 +36,63 @@ export const PlotData = ({ fbData }) => {
     d = [...chartData];
     if (d.length > 0) {
       d.push(fbData[fbData.length - 1]);
-      if (d.length > 20) d.shift();
+      if (d.length > 10) d.shift();
       setChartData([...d]);
     } else {
-      if (fbData.length > 20) setChartData(fbData.slice(-20));
+      if (fbData.length > 20) setChartData(fbData.slice(-10));
       else setChartData([...fbData]);
     }
   };
 
   return (
-    <View>
-      {/* <Text>{JSON.stringify(chartData)}</Text> */}
-      {/* <Text>{JSON.stringify(fbData)}</Text> */}
+    <View style={styles.container}>
       <VictoryChart theme={VictoryTheme.material} height={200}>
         <VictoryLine
           style={{
-            data: { stroke: "#c43a31" },
-            parent: { border: "1px solid #ccc" },
+            data: { stroke: "#078998", strokeWidth: 3 },
+            parent: { border: "2px solid #ccc" },
           }}
           data={chartData}
+          //   labels={({ datum }) => datum.y}
         />
+        <VictoryScatter data={chartData} />
       </VictoryChart>
-      <Button onPress={addData} title="Add" />
+      <View style={styles.dataValues}>
+        <Text style={styles.itemText}>{sensorData.bpm}</Text>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#0782F9",
+    width: "60%",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 40,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  itemText: {
+    color: "white",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  dataValues: {
+    backgroundColor: "#0A638E",
+    width: "60%",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 40,
+  },
+});

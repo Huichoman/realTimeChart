@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -56,6 +57,10 @@ const LoginScreen = () => {
       scrollEnabled
     >
       {/* <View style={styles.container} behavior="padding"> */}
+      <Image
+        source={require("../assets/biosmart-logo.png")}
+        style={styles.logo}
+      />
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
@@ -115,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#198fc2",
     width: "100%",
     padding: 15,
     borderRadius: 10,
@@ -124,7 +129,7 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: "white",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "#198fc2",
     borderWidth: 2,
   },
   buttonText: {
@@ -133,8 +138,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "#198fc2",
     fontWeight: "700",
     fontSize: 16,
+  },
+  logo: {
+    width: 96,
+    height: 96,
+    marginBottom: 15,
   },
 });

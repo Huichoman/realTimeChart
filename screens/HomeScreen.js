@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
+  Image,
 } from "react-native";
 import { auth, db } from "../firebase";
 import {
@@ -19,11 +20,12 @@ import {
 } from "victory-native";
 import { PlotData } from "./PlotData";
 
-let dataRef = db.ref("/temp");
+let dataRef = db.ref("/data");
 
 const HomeScreen = () => {
   const [fbData, setFbData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [sensorData, setSensorData] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -31,11 +33,15 @@ const HomeScreen = () => {
       let d = [];
       let data = snapshot.val();
       let values = Object.values(data);
-
+      let lastValuesIndex = values.length - 1;
       values.map((item, index) => {
-        d.push({ x: index, y: item.value });
+        // let date = new Date();
+        // let currentTime =
+        //   date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        // if (item.time) currentTime = item.time;
+        d.push({ x: index, y: item.bpm });
       });
-
+      setSensorData(values[lastValuesIndex]);
       setFbData(d);
       setIsLoading(false);
     });
@@ -53,10 +59,10 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {!isLoading && <PlotData fbData={fbData} />}
+      {!isLoading && <PlotData fbData={fbData} sensorData={sensorData} />}
 
       {/* <Button onPress={addData} title="Add Earnings" /> */}
-      <Text>Email: {auth.currentUser?.email}</Text>
+      <Text>Userx: {auth.currentUser?.email}</Text>
       <TouchableOpacity onPress={handleSignOut} style={styles.button}>
         <Text style={styles.buttonText}>Sign out</Text>
       </TouchableOpacity>
@@ -89,5 +95,9 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "700",
     fontSize: 16,
+  },
+  logo: {
+    width: 58,
+    height: 58,
   },
 });
