@@ -26,6 +26,7 @@ const HomeScreen = () => {
   const [fbData, setFbData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sensorData, setSensorData] = useState([]);
+  const [tempValue, setTempValue] = useState(5);
 
   useEffect(() => {
     setIsLoading(true);
@@ -35,17 +36,18 @@ const HomeScreen = () => {
       let values = Object.values(data);
       let lastValuesIndex = values.length - 1;
       values.map((item, index) => {
-        // let date = new Date();
-        // let currentTime =
-        //   date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-        // if (item.time) currentTime = item.time;
         d.push({ x: index, y: item.bpm });
       });
-      setSensorData(values[lastValuesIndex]);
       setFbData(d);
+      setSensorData(values[lastValuesIndex]);
+
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    setTempValue(tempValue + 1);
+  }, [fbData]);
 
   const navigation = useNavigation();
   const handleSignOut = () => {
@@ -59,10 +61,13 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {!isLoading && <PlotData fbData={fbData} sensorData={sensorData} />}
+      <Text>{tempValue}</Text>
+      <Text>{tempValue}</Text>
+      {/* {!isLoading && <PlotData fbData={fbData} sensorData={sensorData} />} */}
 
       {/* <Button onPress={addData} title="Add Earnings" /> */}
       <Text>Userx: {auth.currentUser?.email}</Text>
+
       <TouchableOpacity onPress={handleSignOut} style={styles.button}>
         <Text style={styles.buttonText}>Sign out</Text>
       </TouchableOpacity>
@@ -75,11 +80,12 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
+
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#198fc2",
     width: "60%",
     padding: 15,
     borderRadius: 10,

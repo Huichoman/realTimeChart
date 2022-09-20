@@ -12,6 +12,8 @@
     "@dpwiese/react-native-canvas-charts": "^0.0.4",
     "@react-navigation/native": "^6.0.12",
     "@react-navigation/native-stack": "^6.8.0",
+    "@rneui/base": "^4.0.0-rc.6",
+    "@rneui/themed": "^4.0.0-rc.6",
     "expo": "~46.0.9",
     "expo-status-bar": "~1.4.0",
     "firebase": "^9.9.4",
@@ -24,9 +26,9 @@
     "react-native-line-chart": "^1.0.4",
     "react-native-safe-area-context": "4.3.1",
     "react-native-screens": "~3.15.0",
+    "react-native-svg": "12.3.0",
     "react-native-webview": "^11.23.1",
-    "victory-native": "^36.6.7",
-    "react-native-svg": "12.3.0"
+    "victory-native": "^36.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

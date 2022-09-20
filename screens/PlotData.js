@@ -46,7 +46,12 @@ export const PlotData = ({ fbData, sensorData }) => {
 
   return (
     <View style={styles.container}>
-      <VictoryChart theme={VictoryTheme.material} height={200}>
+      {/* <VictoryChart
+        theme={VictoryTheme.material}
+        height={250}
+        minDomain={{ y: 50 }}
+        maxDomain={{ y: 120 }}
+      >
         <VictoryLine
           style={{
             data: { stroke: "#078998", strokeWidth: 3 },
@@ -56,9 +61,25 @@ export const PlotData = ({ fbData, sensorData }) => {
           //   labels={({ datum }) => datum.y}
         />
         <VictoryScatter data={chartData} />
-      </VictoryChart>
-      <View style={styles.dataValues}>
-        <Text style={styles.itemText}>{sensorData.bpm}</Text>
+      </VictoryChart> */}
+      <View style={styles.sensorDataContainer}>
+        <Text style={styles.sensorMeasurementUnitTitle}>PR</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{sensorData.bpm}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>BPM</Text>
+        </View>
+        <View style={styles.horizontalLine}></View>
+        <Text style={styles.sensorMeasurementUnitTitle}>SpO2</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{sensorData.spo2}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>%</Text>
+        </View>
+        <View style={styles.horizontalLine}></View>
+        <Text style={styles.sensorMeasurementUnitTitle}>Temp</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{sensorData.temp}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>°C</Text>
+        </View>
       </View>
     </View>
   );
@@ -68,6 +89,28 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+    margin: 10,
+    width: "90%",
+  },
+  sensorValuecontainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    width: "90%",
+  },
+  sensorDataContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#198fc2",
+    width: "90%",
+    borderWidth: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    padding: 10,
   },
   button: {
     backgroundColor: "#0782F9",
@@ -82,17 +125,26 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
   },
-  itemText: {
+  sensorValueText: {
     color: "white",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 28,
+    paddingRight: 10,
   },
-  dataValues: {
-    backgroundColor: "#0A638E",
-    width: "60%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 40,
+  sensorMeasurementUnitText: {
+    color: "white",
+    fontWeight: "400",
+    fontSize: 18,
+  },
+  sensorMeasurementUnitTitle: {
+    color: "#99EAF3",
+    fontWeight: "700",
+    fontSize: 22,
+  },
+  horizontalLine: {
+    height: 2,
+    backgroundColor: "rgba(255, 255, 255 ,0.3)",
+    alignSelf: "stretch",
+    marginBottom: 15,
   },
 });

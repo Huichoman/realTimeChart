@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   logo: {
-    width: 96,
-    height: 96,
+    width: 110,
+    height: 110,
     marginBottom: 15,
   },
 });
