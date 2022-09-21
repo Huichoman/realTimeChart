@@ -1,4 +1,6 @@
-import { useNavigation } from "@react-navigation/core";
+import { useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -13,30 +15,35 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 import { auth } from "../firebase";
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        navigation.replace("Home");
+        // navigation.replace("Menu");
+        navigation.navigate("Menu");
       }
     });
 
     return unsubscribe;
   }, []);
 
+  // const handleSignUp = () => {
+  //   auth
+  //     .createUserWithEmailAndPassword(email, password)
+  //     .then((userCredentials) => {
+  //       const user = userCredentials.user;
+  //       console.log("Registered with:", user.email);
+  //     })
+  //     .catch((error) => alert(error.message));
+  // };
+
   const handleSignUp = () => {
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Registered with:", user.email);
-      })
-      .catch((error) => alert(error.message));
+    navigation.navigate("Registro");
   };
 
   const handleLogin = () => {
@@ -79,13 +86,20 @@ const LoginScreen = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
+        {/* <TouchableOpacity
+          onPress={handleSignUp}
+          style={[styles.button, styles.buttonOutline]}
+        >
+          <Text style={styles.buttonOutlineText}>Registrarse</Text>
+        </TouchableOpacity> */}
+
         <TouchableOpacity
           onPress={handleSignUp}
           style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonOutlineText}>Register</Text>
+          <Text style={styles.buttonOutlineText}>Registrarse</Text>
         </TouchableOpacity>
       </View>
       {/* </View> */}

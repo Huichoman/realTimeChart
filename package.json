@@ -18,6 +18,7 @@
     "expo-status-bar": "~1.4.0",
     "firebase": "^9.9.4",
     "react": "18.0.0",
+    "react-hook-form": "^7.36.0",
     "react-native": "0.69.5",
     "react-native-chart-kit": "^6.12.0",
     "react-native-charts-wrapper": "^0.5.9",

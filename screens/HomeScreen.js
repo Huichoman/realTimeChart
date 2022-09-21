@@ -22,11 +22,13 @@ import { PlotData } from "./PlotData";
 
 let dataRef = db.ref("/data");
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [fbData, setFbData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sensorData, setSensorData] = useState([]);
-  const [tempValue, setTempValue] = useState(5);
+  const [tempValue, setTempValue] = useState(0);
+  const [spo2Value, setSpo2Value] = useState(0);
+  const [bpmValue, setBpmValue] = useState(0);
 
   useEffect(() => {
     setIsLoading(true);
@@ -46,10 +48,14 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    setTempValue(tempValue + 1);
-  }, [fbData]);
+    if (sensorData) {
+      setTempValue(sensorData.temp);
+      setSpo2Value(sensorData.spo2);
+      setBpmValue(sensorData.bpm);
+    }
+  }, [fbData, sensorData]);
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const handleSignOut = () => {
     auth
       .signOut()
@@ -61,11 +67,30 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>{tempValue}</Text>
-      <Text>{tempValue}</Text>
-      {/* {!isLoading && <PlotData fbData={fbData} sensorData={sensorData} />} */}
+      {!isLoading && fbData && (
+        <PlotData fbData={fbData} sensorData={sensorData} />
+      )}
 
-      {/* <Button onPress={addData} title="Add Earnings" /> */}
+      <View style={styles.sensorDataContainer}>
+        <Text style={styles.sensorMeasurementUnitTitle}>PR</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{bpmValue}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>BPM</Text>
+        </View>
+        <View style={styles.horizontalLine}></View>
+        <Text style={styles.sensorMeasurementUnitTitle}>SpO2</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{spo2Value}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>%</Text>
+        </View>
+        <View style={styles.horizontalLine}></View>
+        <Text style={styles.sensorMeasurementUnitTitle}>Temp</Text>
+        <View style={styles.sensorValuecontainer}>
+          <Text style={styles.sensorValueText}>{tempValue}</Text>
+          <Text style={styles.sensorMeasurementUnitText}>°C</Text>
+        </View>
+      </View>
+
       <Text>Userx: {auth.currentUser?.email}</Text>
 
       <TouchableOpacity onPress={handleSignOut} style={styles.button}>
@@ -105,5 +130,61 @@ const styles = StyleSheet.create({
   logo: {
     width: 58,
     height: 58,
+  },
+
+  sensorValuecontainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    width: "90%",
+  },
+  sensorDataContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#198fc2",
+    width: "90%",
+    borderWidth: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    padding: 10,
+  },
+  button: {
+    backgroundColor: "#0782F9",
+    width: "60%",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 40,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  sensorValueText: {
+    color: "white",
+    fontWeight: "700",
+    fontSize: 28,
+    paddingRight: 10,
+  },
+  sensorMeasurementUnitText: {
+    color: "white",
+    fontWeight: "400",
+    fontSize: 18,
+  },
+  sensorMeasurementUnitTitle: {
+    color: "#99EAF3",
+    fontWeight: "700",
+    fontSize: 22,
+  },
+  horizontalLine: {
+    height: 2,
+    backgroundColor: "rgba(255, 255, 255 ,0.3)",
+    alignSelf: "stretch",
+    marginBottom: 15,
   },
 });

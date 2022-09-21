@@ -27,8 +27,10 @@ export const PlotData = ({ fbData, sensorData }) => {
   //   }, []);
   //
   useEffect(() => {
-    const timer = setTimeout(() => addData(), 1000);
-    return () => clearTimeout(timer);
+    if (fbData) {
+      const timer = setTimeout(() => addData(), 500);
+      return () => clearTimeout(timer);
+    }
   }, [fbData]);
 
   const addData = () => {
@@ -46,23 +48,26 @@ export const PlotData = ({ fbData, sensorData }) => {
 
   return (
     <View style={styles.container}>
-      {/* <VictoryChart
+      <VictoryChart
         theme={VictoryTheme.material}
         height={250}
         minDomain={{ y: 50 }}
         maxDomain={{ y: 120 }}
       >
-        <VictoryLine
-          style={{
-            data: { stroke: "#078998", strokeWidth: 3 },
-            parent: { border: "2px solid #ccc" },
-          }}
-          data={chartData}
-          //   labels={({ datum }) => datum.y}
-        />
+        {chartData && fbData && (
+          <VictoryLine
+            style={{
+              data: { stroke: "#078998", strokeWidth: 3 },
+              parent: { border: "2px solid #ccc" },
+            }}
+            data={chartData}
+            //   labels={({ datum }) => datum.y}
+          />
+        )}
         <VictoryScatter data={chartData} />
-      </VictoryChart> */}
-      <View style={styles.sensorDataContainer}>
+      </VictoryChart>
+
+      {/* <View style={styles.sensorDataContainer}>
         <Text style={styles.sensorMeasurementUnitTitle}>PR</Text>
         <View style={styles.sensorValuecontainer}>
           <Text style={styles.sensorValueText}>{sensorData.bpm}</Text>
@@ -80,7 +85,7 @@ export const PlotData = ({ fbData, sensorData }) => {
           <Text style={styles.sensorValueText}>{sensorData.temp}</Text>
           <Text style={styles.sensorMeasurementUnitText}>°C</Text>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };
