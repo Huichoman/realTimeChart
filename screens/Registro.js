@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,26 +13,51 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { auth } from "../firebase";
 
 import { useForm, Controller } from "react-hook-form";
+import DropDownPicker from "react-native-dropdown-picker";
+
+const listData = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+];
+const requiredMessage = "This field is required";
+const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const Registro = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailx, setEmailx] = useState("");
+  const [passwordx, setPasswordx] = useState("");
   const [name, setName] = useState("");
   const [apellidoPaterno, setApellidoPaterno] = useState("");
   const [apellidoMaterno, setApellidoMaterno] = useState("");
   const [edad, setEdad] = useState("");
-
+  const [listOpen, setListOpen] = useState(false);
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
+    // defaultValues: {
+    //   name: "",
+    //   apellidoPaterno: "",
+    //   apellidoMaterno: "",
+    //   edad: "",
+    //   gender: "",
+    //   email: "",
+    //   password: "",
+    //   passwordRepeat: "",
+    // },
     defaultValues: {
-      nombre: "",
-      apellidoPaterno: "",
-      apellidoMaterno: "",
+      name: "",
+      gender: "",
+      email: "",
+      password: "",
+      passwordRepeat: "",
     },
   });
+
+  const password = useRef({});
+  password.current = watch("password", "");
+
   const onSubmit = (data) => console.log(data);
 
   useEffect(() => {
@@ -52,7 +77,7 @@ const Registro = ({ navigation }) => {
       return;
     }
     auth
-      .createUserWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(emailx, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Registered with:", user.email);
@@ -62,7 +87,7 @@ const Registro = ({ navigation }) => {
 
   const handleLogin = () => {
     auth
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword(emailx, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Logged in with:", user.email);
@@ -80,7 +105,14 @@ const Registro = ({ navigation }) => {
         <Controller
           control={control}
           rules={{
-            required: true,
+            required: {
+              value: true,
+              message: requiredMessage,
+            },
+            pattern: {
+              value: regex,
+              message: "It's not a valid email",
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -88,20 +120,89 @@ const Registro = ({ navigation }) => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              placeholder="Nombre"
+              placeholder="Email"
             />
           )}
-          name="nombre"
+          name="email"
         />
-        {errors.nombre && (
-          <Text style={styles.validationMsgText}>Este campo es requerido.</Text>
+        {errors.email && (
+          <Text style={styles.validationMsgText}>{errors.email.message}</Text>
         )}
 
         <Controller
           control={control}
           rules={{
+            required: requiredMessage,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder="Password"
+            />
+          )}
+          name="password"
+        />
+        {errors.password && (
+          <Text style={styles.validationMsgText}>
+            {errors.password.message}
+          </Text>
+        )}
+
+        <Controller
+          control={control}
+          rules={{
+            required: requiredMessage,
+            validate: (value) =>
+              value === password.current || "Passwords does not match",
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder="Confirm Password"
+            />
+          )}
+          name="passwordRepeat"
+        />
+        {errors.passwordRepeat && (
+          <Text style={styles.validationMsgText}>
+            {errors.passwordRepeat.message}
+          </Text>
+        )}
+
+        <Controller
+          control={control}
+          rules={{
+            required: requiredMessage,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder="Name"
+            />
+          )}
+          name="name"
+        />
+        {errors.name && (
+          <Text style={styles.validationMsgText}>{errors.name.message}</Text>
+        )}
+
+        {/* <Controller
+          control={control}
+          rules={{
             maxLength: 100,
-            required: true,
+            required: {
+              value: true,
+              message: requiredMessage,
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -115,14 +216,19 @@ const Registro = ({ navigation }) => {
           name="apellidoPaterno"
         />
         {errors.apellidoPaterno && (
-          <Text style={styles.validationMsgText}>Este campo es requerido.</Text>
+          <Text style={styles.validationMsgText}>
+            {errors.apellidoPaterno.message}
+          </Text>
         )}
 
         <Controller
           control={control}
           rules={{
             maxLength: 100,
-            required: true,
+            required: {
+              value: true,
+              message: requiredMessage,
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -136,23 +242,86 @@ const Registro = ({ navigation }) => {
           name="apellidoMaterno"
         />
         {errors.apellidoMaterno && (
-          <Text style={styles.validationMsgText}>Este campo es requerido.</Text>
+          <Text style={styles.validationMsgText}>
+            {errors.apellidoMaterno.message}
+          </Text>
         )}
+
+        <Controller
+          control={control}
+          rules={{
+            required: {
+              value: true,
+              message: requiredMessage,
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder="Edad"
+              keyboardType="numeric"
+              maxLength={3}
+            />
+          )}
+          name="edad"
+        />
+        {errors.edad && (
+          <Text style={styles.validationMsgText}>{errors.edad.message}</Text>
+        )} */}
 
         {/* <Button
           title="Submito"
           onPress={handleSubmit(onSubmit)}
           style={[styles.button, styles.buttonOutline]}
         /> */}
-      </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handleSubmit(onSubmit)}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Registrar</Text>
-        </TouchableOpacity>
+        <View style={styles.dropDownContainer}>
+          <Controller
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: requiredMessage,
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <DropDownPicker
+                style={styles.input}
+                placeholder="Gender"
+                placeholderStyle={{
+                  color: "darkgrey",
+                  fontWeight: "400",
+                }}
+                open={listOpen}
+                setOpen={() => setListOpen(!listOpen)}
+                items={listData}
+                value={value}
+                setValue={(item) => onChange(item())}
+                listMode="SCROLLVIEW"
+                onSelectItem={(item) => {
+                  setListOpen(!listOpen);
+                }}
+              />
+            )}
+            name="gender"
+          />
+          {errors.gender && (
+            <Text style={styles.validationMsgText}>
+              {errors.gender.message}
+            </Text>
+          )}
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            style={[styles.button, styles.buttonOutline]}
+          >
+            <Text style={styles.buttonOutlineText}>Sign up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* <View style={styles.container} behavior="padding"> */}
@@ -160,8 +329,8 @@ const Registro = ({ navigation }) => {
         source={require("../assets/biosmart-logo.png")}
         style={styles.logo}
       /> */}
-      <View style={styles.inputContainer}>
-        {/* <TextInput
+      {/* <View style={styles.inputContainer}> */}
+      {/* <TextInput
           placeholder="Email"
           value={email}
           onChangeText={(text) => setEmail(text)}
@@ -195,7 +364,7 @@ const Registro = ({ navigation }) => {
           style={styles.input}
         /> */}
 
-        {/* <TextInput
+      {/* <TextInput
           placeholder="Edad"
           style={styles.input}
           keyboardType="numeric"
@@ -203,7 +372,7 @@ const Registro = ({ navigation }) => {
           value={edad}
           maxLength={3}
         /> */}
-      </View>
+      {/* </View> */}
 
       {/* <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -215,8 +384,6 @@ const Registro = ({ navigation }) => {
       </View> */}
       {/* </View> */}
     </KeyboardAwareScrollView>
-
-    // </KeyboardAvoidingView>
   );
 };
 
@@ -225,12 +392,22 @@ export default Registro;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#222831",
   },
+  scrollContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "#222831",
+    minWidth: "80%",
+    backgroundColor: "red",
+  },
   inputContainer: {
     width: "80%",
+    backgroundColor: "#222831",
+    marginBottom: 20,
   },
   input: {
     backgroundColor: "white",
@@ -243,7 +420,7 @@ const styles = StyleSheet.create({
     width: "60%",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 10,
   },
   button: {
     // backgroundColor: "#198fc2",
@@ -267,7 +444,7 @@ const styles = StyleSheet.create({
   buttonOutlineText: {
     color: "#DDDDDD",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
   },
   logo: {
     width: 110,
@@ -279,13 +456,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: 15,
   },
-  elevation: { elevation: 5, shadowColor: "white" },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    paddingVertical: 45,
-    paddingHorizontal: 25,
+  dropDownContainer: {
     width: "100%",
-    marginVertical: 10,
   },
 });
