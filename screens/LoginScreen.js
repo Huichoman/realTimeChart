@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Dimensions,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 

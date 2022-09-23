@@ -7,11 +7,14 @@ import {
   View,
   Image,
   Button,
+  Dimensions,
 } from "react-native";
 
 import { db, auth } from "../firebase";
 
 let dataRef = db.ref("/users");
+let ScreenHeight = Dimensions.get("window").height;
+let ScreenWidth = Dimensions.get("window").width;
 
 const UserData = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -22,6 +25,7 @@ const UserData = ({ navigation }) => {
   const [edad, setEdad] = useState("");
   const [fbData, setFbData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [genero, setGenero] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
@@ -45,6 +49,10 @@ const UserData = ({ navigation }) => {
     if (fbData) {
       setEmail(fbData.email);
       setName(fbData.name);
+      setApellidoPaterno(fbData.apellidoPaterno);
+      setApellidoMaterno(fbData.apellidoMaterno);
+      setGenero(fbData.gender);
+      setEdad(fbData.edad);
     }
   }, [fbData]);
 
@@ -61,8 +69,21 @@ const UserData = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.validationMsgText}>Datos del usuario</Text>
-      {!isLoading && <Text style={styles.validationMsgText}>{name}</Text>}
+      <View style={styles.dataContainer}>
+        <Text style={styles.titleText}>Datos del usuario</Text>
+        {!isLoading && (
+          <View style={{ alignItems: "center", marginTop: ScreenHeight / 22 }}>
+            <Text
+              style={styles.dataText}
+            >{`${name} ${apellidoPaterno} ${apellidoMaterno}`}</Text>
+            <Text style={styles.dataText}>{`${genero}, ${edad} años`}</Text>
+
+            <Text
+              style={{ ...styles.dataText, marginTop: 10 }}
+            >{`${email}`}</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -75,68 +96,38 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#222831",
+    backgroundColor: "#dedad2",
   },
-  scrollContainer: {
-    justifyContent: "center",
+
+  dataContainer: {
+    flexDirection: "column",
+    justifyContent: "flex-start",
     alignItems: "center",
-    // backgroundColor: "#222831",
-    minWidth: "80%",
-    backgroundColor: "red",
-  },
-  inputContainer: {
-    width: "80%",
-    backgroundColor: "#222831",
-    marginBottom: 20,
-  },
-  input: {
-    backgroundColor: "white",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  buttonContainer: {
-    width: "60%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  button: {
-    // backgroundColor: "#198fc2",
-    backgroundColor: "#30475E",
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonOutline: {
-    backgroundColor: "#30475E",
-    marginTop: 5,
-    borderColor: "#BBBBBB",
+    backgroundColor: "#198fc2",
+    width: "90%",
+    minHeight: ScreenHeight / 3,
     borderWidth: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    padding: 10,
   },
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  buttonOutlineText: {
-    color: "#DDDDDD",
-    fontWeight: "700",
-    fontSize: 18,
-  },
+
   logo: {
     width: 110,
     height: 110,
     marginBottom: 15,
   },
-  validationMsgText: {
-    color: "#FA7D09",
+  titleText: {
+    color: "#99EAF3",
     fontWeight: "400",
-    fontSize: 15,
+    fontSize: 24,
+    marginBottom: 15,
   },
-  dropDownContainer: {
-    width: "100%",
+  dataText: {
+    color: "white",
+    fontWeight: "400",
+    fontSize: ScreenWidth / 22,
   },
 });

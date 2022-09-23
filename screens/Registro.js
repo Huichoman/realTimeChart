@@ -7,19 +7,23 @@ import {
   View,
   Image,
   Button,
+  Dimensions,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 
+let dataRef = db.ref("/user");
+let ScreenHeight = Dimensions.get("window").height;
 import { useForm, Controller } from "react-hook-form";
 import DropDownPicker from "react-native-dropdown-picker";
 
 const listData = [
-  { label: "Male", value: "male" },
-  { label: "Female", value: "female" },
+  { label: "Masculino", value: "Masculino" },
+  { label: "Femenino", value: "Femenino" },
 ];
-const requiredMessage = "This field is required";
+// const requiredMessage = "This field is required";
+const requiredMessage = "Dato obligatorio";
 const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const Registro = ({ navigation }) => {
@@ -36,29 +40,51 @@ const Registro = ({ navigation }) => {
     watch,
     formState: { errors },
   } = useForm({
-    // defaultValues: {
-    //   name: "",
-    //   apellidoPaterno: "",
-    //   apellidoMaterno: "",
-    //   edad: "",
-    //   gender: "",
-    //   email: "",
-    //   password: "",
-    //   passwordRepeat: "",
-    // },
     defaultValues: {
       name: "",
+      apellidoPaterno: "",
+      apellidoMaterno: "",
+      edad: "",
       gender: "",
       email: "",
       password: "",
       passwordRepeat: "",
     },
+    // defaultValues: {
+    //   name: "",
+    //   gender: "",
+    //   email: "",
+    //   password: "",
+    //   passwordRepeat: "",
+    // },
   });
 
   const password = useRef({});
   password.current = watch("password", "");
 
-  const onSubmit = (data) => console.log(data);
+  let addItem = (userData) => {
+    db.ref(`/users`).push({
+      email: userData.email,
+      name: userData.name,
+      apellidoPaterno: userData.apellidoPaterno,
+      apellidoMaterno: userData.apellidoMaterno,
+      edad: userData.edad,
+      gender: userData.gender,
+    });
+  };
+  const onSubmit = (data) => {
+    const userData = {
+      email: data.email,
+      name: data.name,
+      apellidoPaterno: data.apellidoPaterno,
+      apellidoMaterno: data.apellidoMaterno,
+      edad: data.edad,
+      gender: data.gender,
+    };
+    addItem(userData);
+    handleSignUp(data.email, data.password);
+    console.log(data.email);
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -71,13 +97,9 @@ const Registro = ({ navigation }) => {
     return unsubscribe;
   }, []);
 
-  const handleSignUp = () => {
-    if (!name.trim()) {
-      alert("Please Enter Name");
-      return;
-    }
+  const handleSignUp = (userEmail, userPassword) => {
     auth
-      .createUserWithEmailAndPassword(emailx, password)
+      .createUserWithEmailAndPassword(userEmail, userPassword)
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Registered with:", user.email);
@@ -96,294 +118,256 @@ const Registro = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAwareScrollView
-      resetScrollToCoords={{ x: 0, y: 0 }}
-      contentContainerStyle={styles.container}
-      scrollEnabled
-    >
-      <View style={styles.inputContainer}>
-        <Controller
-          control={control}
-          rules={{
-            required: {
-              value: true,
-              message: requiredMessage,
-            },
-            pattern: {
-              value: regex,
-              message: "It's not a valid email",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Email"
+    <View style={styles.container}>
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        // contentContainerStyle={styles.container}
+        // scrollEnabled={true}
+        // enableAutomaticScroll={true}
+        // enableOnAndroid={true}
+      >
+        <View style={styles.formContainer}>
+          <Text style={styles.titleText}>REGISTRO</Text>
+          <View style={styles.inputContainer}>
+            <Controller
+              control={control}
+              rules={{
+                required: {
+                  value: true,
+                  message: requiredMessage,
+                },
+                pattern: {
+                  value: regex,
+                  message: "It's not a valid email",
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Email"
+                />
+              )}
+              name="email"
             />
-          )}
-          name="email"
-        />
-        {errors.email && (
-          <Text style={styles.validationMsgText}>{errors.email.message}</Text>
-        )}
-
-        <Controller
-          control={control}
-          rules={{
-            required: requiredMessage,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Password"
-            />
-          )}
-          name="password"
-        />
-        {errors.password && (
-          <Text style={styles.validationMsgText}>
-            {errors.password.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          rules={{
-            required: requiredMessage,
-            validate: (value) =>
-              value === password.current || "Passwords does not match",
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Confirm Password"
-            />
-          )}
-          name="passwordRepeat"
-        />
-        {errors.passwordRepeat && (
-          <Text style={styles.validationMsgText}>
-            {errors.passwordRepeat.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          rules={{
-            required: requiredMessage,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Name"
-            />
-          )}
-          name="name"
-        />
-        {errors.name && (
-          <Text style={styles.validationMsgText}>{errors.name.message}</Text>
-        )}
-
-        {/* <Controller
-          control={control}
-          rules={{
-            maxLength: 100,
-            required: {
-              value: true,
-              message: requiredMessage,
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Apellido Paterno"
-            />
-          )}
-          name="apellidoPaterno"
-        />
-        {errors.apellidoPaterno && (
-          <Text style={styles.validationMsgText}>
-            {errors.apellidoPaterno.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          rules={{
-            maxLength: 100,
-            required: {
-              value: true,
-              message: requiredMessage,
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Apellido Materno"
-            />
-          )}
-          name="apellidoMaterno"
-        />
-        {errors.apellidoMaterno && (
-          <Text style={styles.validationMsgText}>
-            {errors.apellidoMaterno.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          rules={{
-            required: {
-              value: true,
-              message: requiredMessage,
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Edad"
-              keyboardType="numeric"
-              maxLength={3}
-            />
-          )}
-          name="edad"
-        />
-        {errors.edad && (
-          <Text style={styles.validationMsgText}>{errors.edad.message}</Text>
-        )} */}
-
-        {/* <Button
-          title="Submito"
-          onPress={handleSubmit(onSubmit)}
-          style={[styles.button, styles.buttonOutline]}
-        /> */}
-
-        <View style={styles.dropDownContainer}>
-          <Controller
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: requiredMessage,
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <DropDownPicker
-                style={styles.input}
-                placeholder="Gender"
-                placeholderStyle={{
-                  color: "darkgrey",
-                  fontWeight: "400",
-                }}
-                open={listOpen}
-                setOpen={() => setListOpen(!listOpen)}
-                items={listData}
-                value={value}
-                setValue={(item) => onChange(item())}
-                listMode="SCROLLVIEW"
-                onSelectItem={(item) => {
-                  setListOpen(!listOpen);
-                }}
-              />
+            {errors.email && (
+              <Text style={styles.validationMsgText}>
+                {errors.email.message}
+              </Text>
             )}
-            name="gender"
-          />
-          {errors.gender && (
-            <Text style={styles.validationMsgText}>
-              {errors.gender.message}
-            </Text>
-          )}
+
+            <View style={styles.rowContainer}>
+              <View style={{ width: "48%" }}>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: requiredMessage,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Password"
+                    />
+                  )}
+                  name="password"
+                />
+                {errors.password && (
+                  <Text style={styles.validationMsgText}>
+                    {errors.password.message}
+                  </Text>
+                )}
+              </View>
+
+              <View style={{ width: "48%" }}>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: requiredMessage,
+                    validate: (value) =>
+                      value === password.current || "Passwords does not match",
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Confirm Password"
+                    />
+                  )}
+                  name="passwordRepeat"
+                />
+                {errors.passwordRepeat && (
+                  <Text style={styles.validationMsgText}>
+                    {errors.passwordRepeat.message}
+                  </Text>
+                )}
+              </View>
+            </View>
+            <Controller
+              control={control}
+              rules={{
+                required: requiredMessage,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Name"
+                />
+              )}
+              name="name"
+            />
+            {errors.name && (
+              <Text style={styles.validationMsgText}>
+                {errors.name.message}
+              </Text>
+            )}
+
+            <Controller
+              control={control}
+              rules={{
+                maxLength: 100,
+                required: {
+                  value: true,
+                  message: requiredMessage,
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Apellido Paterno"
+                />
+              )}
+              name="apellidoPaterno"
+            />
+            {errors.apellidoPaterno && (
+              <Text style={styles.validationMsgText}>
+                {errors.apellidoPaterno.message}
+              </Text>
+            )}
+
+            <Controller
+              control={control}
+              rules={{
+                maxLength: 100,
+                required: {
+                  value: true,
+                  message: requiredMessage,
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Apellido Materno"
+                />
+              )}
+              name="apellidoMaterno"
+            />
+            {errors.apellidoMaterno && (
+              <Text style={styles.validationMsgText}>
+                {errors.apellidoMaterno.message}
+              </Text>
+            )}
+
+            <View style={styles.rowContainer}>
+              <View style={{ width: "48%" }}>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: requiredMessage,
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Edad"
+                      keyboardType="numeric"
+                      maxLength={3}
+                    />
+                  )}
+                  name="edad"
+                />
+                {errors.edad && (
+                  <Text style={styles.validationMsgText}>
+                    {errors.edad.message}
+                  </Text>
+                )}
+              </View>
+
+              <View style={{ width: "48%" }}>
+                <View style={styles.dropDownContainer}>
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: requiredMessage,
+                      },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <DropDownPicker
+                        style={styles.inputDp}
+                        placeholder="Gender"
+                        placeholderStyle={{
+                          color: "darkgrey",
+                          fontWeight: "400",
+                        }}
+                        open={listOpen}
+                        dropDownContainerStyle={{
+                          borderWidth: 0,
+                        }}
+                        setOpen={() => setListOpen(!listOpen)}
+                        items={listData}
+                        value={value}
+                        setValue={(item) => onChange(item())}
+                        listMode="SCROLLVIEW"
+                        closeAfterSelecting={true}
+                        // onSelectItem={(item) => {
+                        //   setListOpen(!listOpen);
+                        // }}
+                      />
+                    )}
+                    name="gender"
+                  />
+                  {errors.gender && (
+                    <Text style={styles.validationMsgText}>
+                      {errors.gender.message}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={handleSubmit(onSubmit)}
+                style={[styles.button, styles.buttonOutline]}
+              >
+                <Text style={styles.buttonOutlineText}>Registrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={handleSubmit(onSubmit)}
-            style={[styles.button, styles.buttonOutline]}
-          >
-            <Text style={styles.buttonOutlineText}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* <View style={styles.container} behavior="padding"> */}
-      {/* <Image
-        source={require("../assets/biosmart-logo.png")}
-        style={styles.logo}
-      /> */}
-      {/* <View style={styles.inputContainer}> */}
-      {/* <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
-          autoComplete="email"
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={styles.input}
-          secureTextEntry
-        />
-        <TextInput
-          placeholder="Nombre"
-          value={name}
-          onChangeText={(text) => setName(text)}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Apellido Paterno"
-          value={apellidoPaterno}
-          onChangeText={(text) => setApellidoPaterno(text)}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Apellido Materno"
-          value={apellidoMaterno}
-          onChangeText={(text) => setApellidoMaterno(text)}
-          style={styles.input}
-        /> */}
-
-      {/* <TextInput
-          placeholder="Edad"
-          style={styles.input}
-          keyboardType="numeric"
-          onChangeText={(text) => setEdad(text)}
-          value={edad}
-          maxLength={3}
-        /> */}
-      {/* </View> */}
-
-      {/* <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Registrar</Text>
-        </TouchableOpacity>
-      </View> */}
-      {/* </View> */}
-    </KeyboardAwareScrollView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 };
 
@@ -393,11 +377,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#222831",
+    // backgroundColor: "#222831",
+    backgroundColor: "#dedad2",
+    borderWidth: 2,
+    height: ScreenHeight,
   },
   scrollContainer: {
+    flex: 1,
+    padding: 24,
     justifyContent: "center",
     alignItems: "center",
     // backgroundColor: "#222831",
@@ -405,22 +394,32 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
   },
   inputContainer: {
-    width: "80%",
-    backgroundColor: "#222831",
-    marginBottom: 20,
+    width: "90%",
+    backgroundColor: "#dedad2",
+    marginTop: 20,
+    alignItems: "stretch",
+    borderWidth: 0,
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: "#dedad2",
+    marginTop: ScreenHeight * 0.08,
+    alignItems: "center",
+    borderWidth: 0,
   },
   input: {
     backgroundColor: "white",
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 5,
     borderRadius: 10,
     marginTop: 5,
   },
   buttonContainer: {
-    width: "60%",
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
+    paddingHorizontal: 50,
   },
   button: {
     // backgroundColor: "#198fc2",
@@ -434,7 +433,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#30475E",
     marginTop: 5,
     borderColor: "#BBBBBB",
-    borderWidth: 1,
+    borderWidth: 2,
+    marginTop: ScreenHeight * 0.06,
   },
   buttonText: {
     color: "white",
@@ -457,6 +457,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   dropDownContainer: {
+    // width: "100%",
+    // height: 30,
+    // borderWidth: 1,
+  },
+  rowContainer: {
+    flexDirection: "row",
     width: "100%",
+    justifyContent: "space-between",
+  },
+  columnContainer: {
+    width: "80%",
+  },
+  inputDp: {
+    backgroundColor: "white",
+    paddingHorizontal: 15,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginTop: 5,
+    minHeight: 39,
+    height: "auto",
+    borderWidth: 0,
+  },
+  titleText: {
+    color: "#30475E",
+    fontWeight: "600",
+    fontSize: 24,
+    marginBottom: 15,
   },
 });
