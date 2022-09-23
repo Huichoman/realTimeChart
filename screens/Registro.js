@@ -197,7 +197,7 @@ const Registro = ({ navigation }) => {
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
-                      placeholder="Confirm Password"
+                      placeholder="Confirmar Password"
                     />
                   )}
                   name="passwordRepeat"
@@ -220,7 +220,7 @@ const Registro = ({ navigation }) => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  placeholder="Name"
+                  placeholder="Nombre"
                 />
               )}
               name="name"
@@ -326,7 +326,7 @@ const Registro = ({ navigation }) => {
                     render={({ field: { onChange, value } }) => (
                       <DropDownPicker
                         style={styles.inputDp}
-                        placeholder="Gender"
+                        placeholder="Género"
                         placeholderStyle={{
                           color: "darkgrey",
                           fontWeight: "400",
@@ -359,9 +359,9 @@ const Registro = ({ navigation }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 onPress={handleSubmit(onSubmit)}
-                style={[styles.button, styles.buttonOutline]}
+                style={[styles.button]}
               >
-                <Text style={styles.buttonOutlineText}>Registrar</Text>
+                <Text style={styles.buttonText}>Registrar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -422,15 +422,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
   },
   button: {
-    // backgroundColor: "#198fc2",
-    backgroundColor: "#30475E",
+    backgroundColor: "#198fc2",
     width: "100%",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+    marginTop: ScreenHeight * 0.06,
   },
   buttonOutline: {
-    backgroundColor: "#30475E",
+    backgroundColor: "#198fc2",
     marginTop: 5,
     borderColor: "#BBBBBB",
     borderWidth: 2,
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
   },
   buttonOutlineText: {
     color: "#DDDDDD",

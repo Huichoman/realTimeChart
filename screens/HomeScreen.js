@@ -91,11 +91,11 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <Text>Userx: {auth.currentUser?.email}</Text>
+      {/* <Text>Userx: {auth.currentUser?.email}</Text> */}
 
-      <TouchableOpacity onPress={handleSignOut} style={styles.button}>
+      {/* <TouchableOpacity onPress={handleSignOut} style={styles.button}>
         <Text style={styles.buttonText}>Sign out</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
+    backgroundColor: "#dedad2",
   },
 
   button: {

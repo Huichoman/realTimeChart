@@ -13,6 +13,7 @@ import {
 import { db, auth } from "../firebase";
 
 let dataRef = db.ref("/users");
+let sensorsRef = db.ref("/data");
 let ScreenHeight = Dimensions.get("window").height;
 let ScreenWidth = Dimensions.get("window").width;
 
@@ -56,6 +57,22 @@ const UserData = ({ navigation }) => {
     }
   }, [fbData]);
 
+  const handleSensorData = () => {
+    // sensorsRef.once("value").then((snapshot) => {
+    //   console.log("User data: ", snapshot.val());
+    // });
+    db.ref()
+      .child("data")
+      .orderByChild("time")
+      .startAt("09-16-2022, 21:28:36")
+      .endAt("09-19-2022, 20:58:05")
+      .once("value")
+      .then((snapshot) => {
+        console.log("User data: ", snapshot.val());
+      });
+    console.log("Sensor data");
+  };
+
   //   useEffect(() => {
   //     const unsubscribe = auth.onAuthStateChanged((user) => {
   //       if (user) {
@@ -69,6 +86,11 @@ const UserData = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleSensorData} style={[styles.button]}>
+          <Text style={styles.buttonText}>Get Sensor data</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.dataContainer}>
         <Text style={styles.titleText}>Datos del usuario</Text>
         {!isLoading && (
@@ -129,5 +151,37 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "400",
     fontSize: ScreenWidth / 22,
+  },
+  buttonContainer: {
+    width: "80%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    paddingHorizontal: 50,
+  },
+  button: {
+    backgroundColor: "#198fc2",
+    width: ScreenWidth / 2,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: ScreenHeight * 0.005,
+  },
+  buttonOutline: {
+    backgroundColor: "#198fc2",
+    marginTop: 5,
+    borderColor: "#BBBBBB",
+    borderWidth: 2,
+    marginTop: ScreenHeight * 0.06,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  buttonOutlineText: {
+    color: "#DDDDDD",
+    fontWeight: "700",
+    fontSize: 18,
   },
 });
